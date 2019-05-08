@@ -144,7 +144,9 @@ class SentryPlugin implements Plugin<Project> {
      * @return
      */
     static String getDebugMetaPropPath(Project project, ApplicationVariant variant) {
-        return "${variant.mergeAssets.outputDir}/sentry-debug-meta.properties"
+        def outDir = variant.mergeAssetsProvider.get().outputDir.get()
+
+        return "${outDir}/sentry-debug-meta.properties"
     }
 
     void apply(Project project) {
@@ -161,10 +163,10 @@ class SentryPlugin implements Plugin<Project> {
                     if (manifestPath == null) {
                         try {
                             // Android Gradle Plugin < 3.0.0
-                            manifestPath = variantOutput.processManifest.manifestOutputFile
+                            manifestPath = variantOutput.processManifestProvider.get().manifestOutputFile
                         } catch (Exception ignored) {
                             // Android Gradle Plugin >= 3.0.0
-                            def outputDir = variantOutput.processManifest.manifestOutputDirectory
+                            def outputDir = variantOutput.processManifestProvider.get().manifestOutputDirectory
                             // Gradle 4.7 introduced the lazy task API and AGP 3.3+ adopts that,
                             // so we apparently have a Provider<File> here instead
                             // TODO: This will let us depend on the configuration of each flavor's
